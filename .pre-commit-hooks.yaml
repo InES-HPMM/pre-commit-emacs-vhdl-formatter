@@ -1,0 +1,7 @@
+- id: emacs-vhdl-formatter
+  name: format vhdl files with emacs
+  description: "Format your VHDL files with emacs."
+  entry: emacs-vhdl-formatter
+  language: python
+  types: [vhdl]
+  require_serial: false
