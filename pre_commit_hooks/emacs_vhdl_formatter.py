@@ -32,6 +32,7 @@ def main():
                                     custom_eval=args.custom_eval)
     cmd = [config["cmd"]] + config["base_args"] + [lisp_code]
 
+    num_files_formatted = 0
     for filename in args.filenames:
         with open(filename, "r+") as f:
             with subprocess.Popen(cmd,
@@ -48,6 +49,8 @@ def main():
                         f.truncate()
                         f.write(formatted_code)
                         logging.info(f"{filename} successfully formatted")
+                        if file_content != formatted_code:
+                            num_files_formatted += 1
                     else:
                         logging.error(f"{errs}")
 
@@ -56,6 +59,7 @@ def main():
                     _, errs = proc.communicate()
                     logging.error(f"Subprocess timed out: {errs}")
                     return proc.returncode
+    return num_files_formatted
 
 
 def construct_lisp_code(tab_width, custom_eval):
