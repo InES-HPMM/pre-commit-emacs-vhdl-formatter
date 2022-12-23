@@ -14,6 +14,8 @@ import logging
 import subprocess
 import sys
 
+from ._version import __version__
+
 config = {
     "cmd":
     "emacs",
@@ -101,6 +103,7 @@ def _build_parser():
         type=int,
         default=4,
         help="Number of spaces per indentation level. Defaults to 4")
+    parser.add_argument("--version", action="version", version=__version__)
     return parser
 
 

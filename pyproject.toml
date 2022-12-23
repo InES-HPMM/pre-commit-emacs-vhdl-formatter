@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=45", "setuptools-scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "emacs-vhdl-formatter"
+description = "Format your VHDL files with emacs"
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.7"
+authors = [
+  { name = "Thierry Delafontaine", email = "deaa@zhaw.ch"},
+]
+keywords = [
+  "automation",
+  "emacs",
+  "formatter",
+  "vhdl",
+  "vhdl-mode",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Intended Audience :: Developers",
+  "Topic :: Scientific/Engineering :: Electronic Design Automation (EDA)",
+]
+dynamic = ["version"]
+
+[project.scripts]
+emacs-vhdl-formatter = "pre_commit_hooks.emacs_vhdl_formatter:main"
+
+[project.urls]
+homepage = "https://github.com/InES-HPMM/pre-commit-emacs-vhdl-formatter"
+
+[tool.setuptools_scm]
+write_to = "pre_commit_hooks/_version.py"
+
+[tool.pydocstyle]
+convention = "google"
+
+[tool.yapf]
+based_on_style = "pep8"
+split_before_logical_operator = true
