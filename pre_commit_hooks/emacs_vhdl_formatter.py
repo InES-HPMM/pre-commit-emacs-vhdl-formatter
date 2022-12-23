@@ -37,7 +37,8 @@ def main() -> int:
     cmd += Config.base_args
     cmd.append(lisp_code)
 
-    return_code = 0
+    num_formatted = 0
+    num_checked = 0
     for filename in args.filenames:
         with open(filename, "r+") as f:
             with subprocess.Popen(
@@ -56,8 +57,10 @@ def main() -> int:
                         f.truncate()
                         f.write(formatted_code)
                         logging.info(f"{filename} successfully formatted")
+                        num_checked += 1
                         if file_content != formatted_code:
-                            return_code = 1
+                            num_formatted += 1
+                            print(f"reformatted {filename}")
                     else:
                         logging.error(f"{errs}")
 
@@ -66,7 +69,11 @@ def main() -> int:
                     _, errs = proc.communicate()
                     logging.error(f"Subprocess timed out: {errs}")
                     return proc.returncode
-    return return_code
+    if num_formatted > 0:
+        print(f"{num_formatted} file(s) formatted, {num_checked} files checked")
+        return 1
+    else:
+        return 0
 
 
 def construct_lisp_code(tab_width: int, custom_eval: str) -> str:
