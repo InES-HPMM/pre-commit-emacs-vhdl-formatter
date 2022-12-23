@@ -34,9 +34,12 @@ homepage = "https://github.com/InES-HPMM/pre-commit-emacs-vhdl-formatter"
 [tool.setuptools_scm]
 write_to = "pre_commit_hooks/_version.py"
 
+[tool.black]
+line-length = 80
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+
 [tool.pydocstyle]
 convention = "google"
-
-[tool.yapf]
-based_on_style = "pep8"
-split_before_logical_operator = true
