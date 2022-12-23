@@ -16,32 +16,37 @@ import sys
 
 from ._version import __version__
 
-config = {
-    "cmd":
-    "emacs",
-    "base_args": ["--batch", "--eval"],
-    "lisp_code":
-    '(let (vhdl-file-content next-line) (while (setq next-line (ignore-errors (read-from-minibuffer ""))) (setq vhdl-file-content (concat vhdl-file-content next-line "\n"))) (with-temp-buffer (vhdl-mode) {} (setq vhdl-basic-offset {}) (insert vhdl-file-content) (vhdl-beautify-region (point-min) (point-max)) (princ (buffer-string))))',  # noqa: E501
-}
+
+class Config:
+    """Default configuration."""
+
+    cmd = "emacs"
+    base_args = ["--batch", "--eval"]
+    lisp_code = '(let (vhdl-file-content next-line) (while (setq next-line (ignore-errors (read-from-minibuffer ""))) (setq vhdl-file-content (concat vhdl-file-content next-line "\n"))) (with-temp-buffer (vhdl-mode) {} (setq vhdl-basic-offset {}) (insert vhdl-file-content) (vhdl-beautify-region (point-min) (point-max)) (princ (buffer-string))))'  # noqa: E501
 
 
-def main():
+def main() -> int:
     """Call emacs as a subprocess."""
     parser = _build_parser()
     args = parser.parse_args(sys.argv[1:])
 
-    lisp_code = construct_lisp_code(tab_width=args.tab_width,
-                                    custom_eval=args.custom_eval)
-    cmd = [config["cmd"]] + config["base_args"] + [lisp_code]
+    lisp_code = construct_lisp_code(
+        tab_width=args.tab_width, custom_eval=args.custom_eval
+    )
+    cmd = [Config.cmd]
+    cmd += Config.base_args
+    cmd.append(lisp_code)
 
     num_files_formatted = 0
     for filename in args.filenames:
         with open(filename, "r+") as f:
-            with subprocess.Popen(cmd,
-                                  stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  text=True) as proc:
+            with subprocess.Popen(
+                cmd,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+            ) as proc:
                 try:
                     file_content = f.read()
                     formatted_code, errs = proc.communicate(input=file_content)
@@ -64,8 +69,8 @@ def main():
     return num_files_formatted
 
 
-def construct_lisp_code(tab_width, custom_eval):
-    """Construct the evaluated lisp code.
+def construct_lisp_code(tab_width: int, custom_eval: str) -> str:
+    """Constructs the evaluated lisp code.
 
     Arguments:
         tab_width: number fo spaces per indentation level
@@ -73,36 +78,41 @@ def construct_lisp_code(tab_width, custom_eval):
 
     Returns: A string containing the lisp code.
     """
-    return config["lisp_code"].format(custom_eval, tab_width)
+    return Config.lisp_code.format(custom_eval, tab_width)
 
 
-def _build_parser():
+def _build_parser() -> argparse.ArgumentParser:
     """Constructs the parser for the command line arguments.
 
     Returns: An ArgumentParser instant.
     """
     parser = argparse.ArgumentParser(
         prog="emacs-vhdl-formatter",
-        description="Format your VHDL files with emacs.")
+        description="Format your VHDL files with emacs.",
+    )
 
-    parser.add_argument("filenames",
-                        metavar="<filename>",
-                        type=str,
-                        nargs='+',
-                        help="Files to process")
+    parser.add_argument(
+        "filenames",
+        metavar="<filename>",
+        type=str,
+        nargs="+",
+        help="Files to process",
+    )
     parser.add_argument(
         "--custom-eval",
         metavar="'(lisp-code)'",
         type=str,
         default="",
-        help="Custom lisp code which gets evaluated before the formatting")
+        help="Custom lisp code which gets evaluated before the formatting",
+    )
 
     parser.add_argument(
         "--tab-width",
-        metavar=4,
+        metavar="4",
         type=int,
         default=4,
-        help="Number of spaces per indentation level. Defaults to 4")
+        help="Number of spaces per indentation level. Defaults to 4",
+    )
     parser.add_argument("--version", action="version", version=__version__)
     return parser
 
